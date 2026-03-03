@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Nager.Moco/Nager.Moco.csproj" />
+  <Project Path="Nager.Moco.TestConsole/Nager.Moco.TestConsole.csproj" />
+</Solution>
