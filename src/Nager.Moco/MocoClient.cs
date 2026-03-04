@@ -33,29 +33,38 @@ namespace Nager.Moco
         }
 
         public async Task<Company?> GetCompanyAsync(
-            int customerId,
+            int id,
             CancellationToken cancellationToken = default)
         {
-            using var httpResponseMessage = await this._httpClient.GetAsync($"/api/v1/companies/{customerId}", cancellationToken);
+            using var httpResponseMessage = await this._httpClient.GetAsync($"/api/v1/companies/{id}", cancellationToken);
             return await httpResponseMessage.Content.ReadFromJsonAsync<Company>(this._jsonSerializerOptions, cancellationToken);
         }
 
-        public async Task CreateCompanyAsync(
+        public async Task<bool> DeleteCompanyAsync(
+            int id,
+            CancellationToken cancellationToken = default)
+        {
+            using var httpResponseMessage = await this._httpClient.DeleteAsync($"/api/v1/companies/{id}", cancellationToken);
+
+            return httpResponseMessage.IsSuccessStatusCode;
+        }
+
+        public async Task<Company?> CreateCompanyAsync(
             CompanyCreateRequest createRequest,
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync("/api/v1/companies", createRequest, this._jsonSerializerOptions, cancellationToken);
 
-            var json = await httpResponseMessage.Content.ReadFromJsonAsync<Company>(cancellationToken);
+            return await httpResponseMessage.Content.ReadFromJsonAsync<Company>(cancellationToken);
         }
 
-        public async Task CreateInvoiceAsync(
+        public async Task<Invoice?> CreateInvoiceAsync(
             InvoiceCreateRequest createRequest,
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync("/api/v1/invoices", createRequest, this._jsonSerializerOptions, cancellationToken);
 
-            var json = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+            return await httpResponseMessage.Content.ReadFromJsonAsync<Invoice>(cancellationToken);
         }
 
         public async Task<Invoice?> GetInvoiceAsync(
@@ -72,7 +81,7 @@ namespace Nager.Moco
         }
 
         public async Task<bool> SendInvoiceAsync(
-            string invoiceId,
+            int invoiceId,
             InvoiceSendEmailRequest invoiceSendEmailRequest,
             CancellationToken cancellationToken = default)
         {

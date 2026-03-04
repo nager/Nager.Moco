@@ -4,15 +4,23 @@ using Nager.Moco.Models;
 var mocoClient = new MocoClient("mycustomdomain", "my_api_key");
 var companies = await mocoClient.GetCompaniesAsync();
 
-await mocoClient.CreateCompanyAsync(new CompanyCreateRequest
+var companyCreateRequest = new CompanyCreateRequest
 {
     Name = "My Test Company",
     Currency = "EUR",
-});
+    CountryCode = "DE",
+    VatIdentifier = ""
+};
+
+var newCompany1 = await mocoClient.CreateCompanyAsync(companyCreateRequest);
+
+var isDeleted = await mocoClient.DeleteCompanyAsync(newCompany1.Id);
+
+var newCompany2 = await mocoClient.CreateCompanyAsync(companyCreateRequest);
 
 var invoiceCreateRequest = new InvoiceCreateRequest
 {
-    CustomerId = "763125795", //K0005
+    CustomerId = newCompany2.Id,
     RecipientAddress = "Test Address 1b",
     Date = "2026-04-01",
     DueDate = "2026-04-01",
@@ -37,13 +45,13 @@ var invoiceCreateRequest = new InvoiceCreateRequest
     ]
 };
 
-await mocoClient.CreateInvoiceAsync(invoiceCreateRequest);
+var invoice = await mocoClient.CreateInvoiceAsync(invoiceCreateRequest);
 
-await mocoClient.SendInvoiceAsync("invoiceId", new InvoiceSendEmailRequest
+var sendResponse = await mocoClient.SendInvoiceAsync(invoice.Id, new InvoiceSendEmailRequest
 {
     EmailsTo = "",
-    Subject = "",
-    Text = ""
+    Subject = "test",
+    Text = "test"
 });
 
 Console.WriteLine("process done");

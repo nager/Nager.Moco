@@ -2,7 +2,7 @@
 {
     public class InvoiceCreateRequest
     {
-        public string CustomerId { get; set; }
+        public int CustomerId { get; set; }
         public string RecipientAddress { get; set; }
         public string Date { get; set; }
         public string DueDate { get; set; }
