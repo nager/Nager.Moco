@@ -1,7 +1,12 @@
-﻿using Nager.Moco;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Nager.Moco;
 using Nager.Moco.Models;
 
-var mocoClient = new MocoClient("mycustomdomain", "my_api_key");
+var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+
+var mocoClient = new MocoClient(httpClientFactory, "mycustomdomain", "my_api_key");
+
 var companies = await mocoClient.GetCompaniesAsync();
 
 var companyCreateRequest = new CompanyCreateRequest

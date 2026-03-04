@@ -5,12 +5,13 @@ using System.Text.Json;
 
 namespace Nager.Moco
 {
-    public class MocoClient
+    public class MocoClient : IMocoClient
     {
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         public MocoClient(
+            IHttpClientFactory httpClientFactory,
             string mocoCustomerDomain,
             string apiToken)
         {
@@ -20,7 +21,7 @@ namespace Nager.Moco
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
             };
 
-            this._httpClient = new HttpClient();
+            this._httpClient = httpClientFactory.CreateClient();
             this._httpClient.BaseAddress = new Uri($"https://{mocoCustomerDomain}.mocoapp.com");
             this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", $"token={apiToken}");
         }
@@ -68,7 +69,7 @@ namespace Nager.Moco
         }
 
         public async Task<Invoice?> GetInvoiceAsync(
-            string invoiceId,
+            int invoiceId,
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.GetAsync($"/api/v1/invoices/{invoiceId}", cancellationToken);
