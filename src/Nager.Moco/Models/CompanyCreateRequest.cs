@@ -11,5 +11,9 @@
         public string? CountryCode { get; set; }
 
         public string? VatIdentifier { get; set; }
+
+        public string? Address { get; set; }
+
+        public bool AlternativeCorrespondenceLanguage { get; set; } = false;
     }
 }

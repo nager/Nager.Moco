@@ -10,5 +10,7 @@
         public int Tax { get; set; }
         public string Currency { get; set; }
         public InvoiceItem[] Items { get; set; } = [];
+
+        public string? Footer { get; set; }
     }
 }
