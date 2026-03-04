@@ -29,8 +29,11 @@ namespace Nager.Moco
         public async Task<Company[]?> GetCompaniesAsync(
             CancellationToken cancellationToken = default)
         {
-            var items = await this._httpClient.GetFromJsonAsync<Company[]>("/api/v1/companies", cancellationToken);
-            return items;
+            using var httpResponseMessage = await this._httpClient.GetAsync("/api/v1/companies", cancellationToken);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<Company[]>(this._jsonSerializerOptions, cancellationToken);
         }
 
         public async Task<Company?> GetCompanyAsync(
@@ -38,6 +41,9 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.GetAsync($"/api/v1/companies/{id}", cancellationToken);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+
             return await httpResponseMessage.Content.ReadFromJsonAsync<Company>(this._jsonSerializerOptions, cancellationToken);
         }
 
@@ -56,6 +62,8 @@ namespace Nager.Moco
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync("/api/v1/companies", createRequest, this._jsonSerializerOptions, cancellationToken);
 
+            httpResponseMessage.EnsureSuccessStatusCode();
+
             return await httpResponseMessage.Content.ReadFromJsonAsync<Company>(cancellationToken);
         }
 
@@ -64,6 +72,8 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync("/api/v1/invoices", createRequest, this._jsonSerializerOptions, cancellationToken);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
 
             return await httpResponseMessage.Content.ReadFromJsonAsync<Invoice>(cancellationToken);
         }
