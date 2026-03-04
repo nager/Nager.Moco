@@ -26,8 +26,10 @@ To start using the API, you need your MOCO subdomain and an API key (Personal AP
 ```csharp
 using Nager.Moco;
 
-var mocoClient = new MocoClient("your-subdomain", "your-api-key");
+var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 
+var mocoClient = new MocoClient(httpClientFactory, "mycustomdomain", "my_api_key");
 ```
 
 ### Examples
