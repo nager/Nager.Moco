@@ -1,5 +1,4 @@
 <Solution>
   <Project Path="Nager.Moco.TestConsole/Nager.Moco.TestConsole.csproj" />
   <Project Path="Nager.Moco/Nager.Moco.csproj" />
-  <Project Path="StripeConnector/StripeConnector.csproj" Id="25ffbdbb-5803-4d4a-acbd-da251c95f4ec" />
 </Solution>
