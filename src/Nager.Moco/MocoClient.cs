@@ -6,11 +6,17 @@ using System.Text.Json;
 
 namespace Nager.Moco
 {
+    /// <summary>
+    /// Moco Client
+    /// </summary>
     public class MocoClient : IMocoClient
     {
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
+        /// <summary>
+        /// Moco Client
+        /// </summary>
         public MocoClient(
             IHttpClientFactory httpClientFactory,
             string mocoCustomerDomain,
@@ -144,6 +150,11 @@ namespace Nager.Moco
             {
                 return null;
             }
+
+            //TODO: Forward information add Global Page Parameter
+            httpResponseMessage.Headers.TryGetValues("X-Page", out var xPage);
+            httpResponseMessage.Headers.TryGetValues("X-Per-Page", out var xPerPage);
+            httpResponseMessage.Headers.TryGetValues("X-Total", out var xTotal);
 
             return await httpResponseMessage.Content.ReadFromJsonAsync<Invoice[]>(this._jsonSerializerOptions, cancellationToken);
         }
