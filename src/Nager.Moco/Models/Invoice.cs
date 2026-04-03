@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public int ProjectId { get; set; }
+        public int? ProjectId { get; set; }
         public string Identifier { get; set; }
         public DateTime Date { get; set; }
         public string DueDate { get; set; }
@@ -26,8 +26,8 @@
         public float Discount { get; set; }
         public float CashDiscount { get; set; }
         public float CashDiscountDays { get; set; }
-        public string DebitNumber { get; set; }
-        public string CreditNumber { get; set; }
+        public int? DebitNumber { get; set; }
+        public int? CreditNumber { get; set; }
         public bool Locked { get; set; }
         public CustomProperties CustomProperties { get; set; }
         public object[] Tags { get; set; }

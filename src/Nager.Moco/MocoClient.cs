@@ -1,6 +1,7 @@
 ﻿using Nager.Moco.Models;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace Nager.Moco
@@ -95,6 +96,56 @@ namespace Nager.Moco
             }
 
             return await httpResponseMessage.Content.ReadFromJsonAsync<Invoice>(this._jsonSerializerOptions, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<Invoice[]?> GetInvoicesAsync(
+            InvoiceQueryFilter? invoiceQueryFilter = null,
+            CancellationToken cancellationToken = default)
+        {
+            var queryParameters = new Dictionary<string, string>();
+
+            if (invoiceQueryFilter is not null)
+            {
+                if (invoiceQueryFilter.CompanyId is not null)
+                {
+                    queryParameters.Add("company_id", $"{invoiceQueryFilter.CompanyId}");
+                }
+                if (invoiceQueryFilter.ProjectId is not null)
+                {
+                    queryParameters.Add("project_id", $"{invoiceQueryFilter.ProjectId}");
+                }
+                if (invoiceQueryFilter.DateFrom is not null)
+                {
+                    queryParameters.Add("date_from", $"{invoiceQueryFilter.DateFrom:yyyy-MM-dd}");
+                }
+                if (invoiceQueryFilter.DateTo is not null)
+                {
+                    queryParameters.Add("date_to", $"{invoiceQueryFilter.DateTo:yyyy-MM-dd}");
+                }
+            }
+
+            string queryParams;
+            using (var content = new FormUrlEncodedContent(queryParameters))
+            {
+                queryParams = await content.ReadAsStringAsync(cancellationToken);
+            }
+
+            var url = new StringBuilder();
+            url.Append("/api/v1/invoices");
+            if (!string.IsNullOrEmpty(queryParams))
+            {
+                url.Append("?");
+                url.Append(queryParams);
+            }
+
+            using var httpResponseMessage = await this._httpClient.GetAsync(url.ToString(), cancellationToken);
+            if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return null;
+            }
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<Invoice[]>(this._jsonSerializerOptions, cancellationToken);
         }
 
         /// <inheritdoc />
