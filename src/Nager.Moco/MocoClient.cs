@@ -17,9 +17,12 @@ namespace Nager.Moco
         /// <summary>
         /// Moco Client
         /// </summary>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="mocoAccount"></param>
+        /// <param name="apiToken"></param>
         public MocoClient(
             IHttpClientFactory httpClientFactory,
-            string mocoCustomerDomain,
+            string mocoAccount,
             string apiToken)
         {
             this._jsonSerializerOptions = new JsonSerializerOptions
@@ -29,7 +32,7 @@ namespace Nager.Moco
             };
 
             this._httpClient = httpClientFactory.CreateClient();
-            this._httpClient.BaseAddress = new Uri($"https://{mocoCustomerDomain}.mocoapp.com");
+            this._httpClient.BaseAddress = new Uri($"https://{mocoAccount}.mocoapp.com");
             this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", $"token={apiToken}");
         }
 
@@ -91,7 +94,7 @@ namespace Nager.Moco
         }
 
         /// <inheritdoc />
-        public async Task<Invoice?> GetInvoiceAsync(
+        public async Task<InvoiceDetail?> GetInvoiceAsync(
             int invoiceId,
             CancellationToken cancellationToken = default)
         {
@@ -101,33 +104,33 @@ namespace Nager.Moco
                 return null;
             }
 
-            return await httpResponseMessage.Content.ReadFromJsonAsync<Invoice>(this._jsonSerializerOptions, cancellationToken);
+            return await httpResponseMessage.Content.ReadFromJsonAsync<InvoiceDetail>(this._jsonSerializerOptions, cancellationToken);
         }
 
         /// <inheritdoc />
         public async Task<Invoice[]?> GetInvoicesAsync(
-            InvoiceQueryFilter? invoiceQueryFilter = null,
+            InvoiceQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default)
         {
             var queryParameters = new Dictionary<string, string>();
 
-            if (invoiceQueryFilter is not null)
+            if (queryFilter is not null)
             {
-                if (invoiceQueryFilter.CompanyId is not null)
+                if (queryFilter.CompanyId is not null)
                 {
-                    queryParameters.Add("company_id", $"{invoiceQueryFilter.CompanyId}");
+                    queryParameters.Add("company_id", $"{queryFilter.CompanyId}");
                 }
-                if (invoiceQueryFilter.ProjectId is not null)
+                if (queryFilter.ProjectId is not null)
                 {
-                    queryParameters.Add("project_id", $"{invoiceQueryFilter.ProjectId}");
+                    queryParameters.Add("project_id", $"{queryFilter.ProjectId}");
                 }
-                if (invoiceQueryFilter.DateFrom is not null)
+                if (queryFilter.DateFrom is not null)
                 {
-                    queryParameters.Add("date_from", $"{invoiceQueryFilter.DateFrom:yyyy-MM-dd}");
+                    queryParameters.Add("date_from", $"{queryFilter.DateFrom:yyyy-MM-dd}");
                 }
-                if (invoiceQueryFilter.DateTo is not null)
+                if (queryFilter.DateTo is not null)
                 {
-                    queryParameters.Add("date_to", $"{invoiceQueryFilter.DateTo:yyyy-MM-dd}");
+                    queryParameters.Add("date_to", $"{queryFilter.DateTo:yyyy-MM-dd}");
                 }
             }
 
@@ -141,15 +144,12 @@ namespace Nager.Moco
             url.Append("/api/v1/invoices");
             if (!string.IsNullOrEmpty(queryParams))
             {
-                url.Append("?");
+                url.Append('?');
                 url.Append(queryParams);
             }
 
             using var httpResponseMessage = await this._httpClient.GetAsync(url.ToString(), cancellationToken);
-            if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return null;
-            }
+            httpResponseMessage.EnsureSuccessStatusCode();
 
             //TODO: Forward information add Global Page Parameter
             httpResponseMessage.Headers.TryGetValues("X-Page", out var xPage);
@@ -166,10 +166,103 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync($"/api/v1/invoices/{invoiceId}/send_email", invoiceSendEmailRequest, this._jsonSerializerOptions, cancellationToken);
+            httpResponseMessage.EnsureSuccessStatusCode();
 
-            var json = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+            //var json = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
 
             return httpResponseMessage.IsSuccessStatusCode;
+        }
+
+        /// <inheritdoc />
+        public async Task<Receipt[]?> GetReceiptsAsync(
+            ReceiptQueryFilter? queryFilter = null,
+            CancellationToken cancellationToken = default)
+        {
+            var queryParameters = new Dictionary<string, string>();
+
+            if (queryFilter is not null)
+            {
+                if (queryFilter.ProjectId is not null)
+                {
+                    queryParameters.Add("project_id", $"{queryFilter.ProjectId}");
+                }
+                if (queryFilter.DateFrom is not null)
+                {
+                    queryParameters.Add("from", $"{queryFilter.DateFrom:yyyy-MM-dd}");
+                }
+                if (queryFilter.DateTo is not null)
+                {
+                    queryParameters.Add("to", $"{queryFilter.DateTo:yyyy-MM-dd}");
+                }
+            }
+
+            string queryParams;
+            using (var content = new FormUrlEncodedContent(queryParameters))
+            {
+                queryParams = await content.ReadAsStringAsync(cancellationToken);
+            }
+
+            var url = new StringBuilder();
+            url.Append("/api/v1/receipts");
+            if (!string.IsNullOrEmpty(queryParams))
+            {
+                url.Append('?');
+                url.Append(queryParams);
+            }
+
+            using var httpResponseMessage = await this._httpClient.GetAsync(url.ToString(), cancellationToken);
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            //TODO: Forward information add Global Page Parameter
+            httpResponseMessage.Headers.TryGetValues("X-Page", out var xPage);
+            httpResponseMessage.Headers.TryGetValues("X-Per-Page", out var xPerPage);
+            httpResponseMessage.Headers.TryGetValues("X-Total", out var xTotal);
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<Receipt[]>(this._jsonSerializerOptions, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<Purchase[]?> GetPurchasesAsync(
+            PurchaseQueryFilter? queryFilter = null,
+            CancellationToken cancellationToken = default)
+        {
+            var queryParameters = new Dictionary<string, string>();
+
+            if (queryFilter is not null)
+            {
+                if (queryFilter.CompanyId is not null)
+                {
+                    queryParameters.Add("company_id", $"{queryFilter.CompanyId}");
+                }
+                if (queryFilter.DateFrom is not null && queryFilter.DateTo is not null)
+                {
+                    queryParameters.Add("date", $"{queryFilter.DateFrom:yyyy-MM-dd}-{queryFilter.DateTo:yyyy-MM-dd}");
+                }
+            }
+
+            string queryParams;
+            using (var content = new FormUrlEncodedContent(queryParameters))
+            {
+                queryParams = await content.ReadAsStringAsync(cancellationToken);
+            }
+
+            var url = new StringBuilder();
+            url.Append("/api/v1/purchases");
+            if (!string.IsNullOrEmpty(queryParams))
+            {
+                url.Append('?');
+                url.Append(queryParams);
+            }
+
+            using var httpResponseMessage = await this._httpClient.GetAsync(url.ToString(), cancellationToken);
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            //TODO: Forward information add Global Page Parameter
+            httpResponseMessage.Headers.TryGetValues("X-Page", out var xPage);
+            httpResponseMessage.Headers.TryGetValues("X-Per-Page", out var xPerPage);
+            httpResponseMessage.Headers.TryGetValues("X-Total", out var xTotal);
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<Purchase[]>(this._jsonSerializerOptions, cancellationToken);
         }
     }
 }

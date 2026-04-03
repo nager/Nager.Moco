@@ -4,6 +4,8 @@ namespace Nager.Moco
 {
     public interface IMocoClient
     {
+        #region Company
+
         Task<Company?> CreateCompanyAsync(
             CompanyCreateRequest createRequest,
             CancellationToken cancellationToken = default);
@@ -19,13 +21,15 @@ namespace Nager.Moco
             int id,
             CancellationToken cancellationToken = default);
 
+        #endregion
+
         #region Invoice
 
         Task<Invoice[]?> GetInvoicesAsync(
-            InvoiceQueryFilter? invoiceFilter,
+            InvoiceQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
-        Task<Invoice?> GetInvoiceAsync(
+        Task<InvoiceDetail?> GetInvoiceAsync(
             int invoiceId,
             CancellationToken cancellationToken = default);
 
@@ -43,6 +47,22 @@ namespace Nager.Moco
         Task<bool> SendInvoiceAsync(
             int invoiceId,
             InvoiceSendEmailRequest invoiceSendEmailRequest,
+            CancellationToken cancellationToken = default);
+
+        #endregion
+
+        #region Purchases
+
+        Task<Purchase[]?> GetPurchasesAsync(
+            PurchaseQueryFilter? queryFilter = null,
+            CancellationToken cancellationToken = default);
+
+        #endregion
+
+        #region Receipt
+
+        Task<Receipt[]?> GetReceiptsAsync(
+            ReceiptQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
         #endregion

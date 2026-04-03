@@ -1,6 +1,6 @@
 ﻿namespace Nager.Moco.Models
 {
-    public class Invoice
+    public class InvoiceDetail
     {
         /// <summary>
         /// Internal invoice ID
@@ -70,5 +70,12 @@
         public string FileUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string Salutation { get; set; }
+        public string Footer { get; set; }
+        public InvoiceItem[] Items { get; set; }
+        public Payment[] Payments { get; set; }
+        public object[] Reminders { get; set; }
+        public InternalContact InternalContact { get; set; }
+        public bool ActivityHoursModified { get; set; }
     }
 }
