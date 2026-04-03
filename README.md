@@ -4,7 +4,7 @@ A lightweight .NET client for the [MOCO API](https://everii-group.github.io/moco
 
 ## Installation
 
-You can install the package via NuGet Package Manager:
+You can install the package via [NuGet](https://www.nuget.org/packages/Nager.Moco)
 
 ```bash
 dotnet add package Nager.Moco
