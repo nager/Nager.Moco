@@ -236,7 +236,7 @@ namespace Nager.Moco
                 }
                 if (queryFilter.DateFrom is not null && queryFilter.DateTo is not null)
                 {
-                    queryParameters.Add("date", $"{queryFilter.DateFrom:yyyy-MM-dd}-{queryFilter.DateTo:yyyy-MM-dd}");
+                    queryParameters.Add("date", $"{queryFilter.DateFrom:yyyy-MM-dd}:{queryFilter.DateTo:yyyy-MM-dd}");
                 }
             }
 

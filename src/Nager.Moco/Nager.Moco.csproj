@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Tino Hager</Authors>
     <Company>nager.at</Company>
-    <Description></Description>
+    <Description>C# client for the MOCO APP. Easily integrate invoices, purchases into .NET apps with a simple, type-safe interface.</Description>
     
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -25,7 +25,7 @@
     
     <TargetFrameworks>net10.0</TargetFrameworks>
     
-    <Version>1.0.0-beta3</Version>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
