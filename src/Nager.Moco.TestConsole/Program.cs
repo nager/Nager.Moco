@@ -7,7 +7,10 @@ var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>()
 
 var mocoClient = new MocoClient(httpClientFactory, "mycustomdomain", "my_api_key");
 
-var companies = await mocoClient.GetCompaniesAsync();
+
+var companies = await mocoClient.GetCompaniesAsync(page: 2);
+var purchases = await mocoClient.GetPurchasesAsync(page: 1, new PurchaseQueryFilter { DateFrom = new DateOnly(2025, 06, 01), DateTo = new DateOnly(2026, 04, 03) } );
+var receipts = await mocoClient.GetReceiptsAsync();
 
 var companyCreateRequest = new CompanyCreateRequest
 {

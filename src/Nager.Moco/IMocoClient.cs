@@ -11,21 +11,23 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default);
 
         Task<bool> DeleteCompanyAsync(
-            int id,
+            int companyId,
             CancellationToken cancellationToken = default);
 
-        Task<Company[]?> GetCompaniesAsync(
+        Task<PagingInfo<Company>> GetCompaniesAsync(
+            int page = 1,
             CancellationToken cancellationToken = default);
 
         Task<Company?> GetCompanyAsync(
-            int id,
+            int companyId,
             CancellationToken cancellationToken = default);
 
         #endregion
 
         #region Invoice
 
-        Task<Invoice[]?> GetInvoicesAsync(
+        Task<PagingInfo<Invoice>> GetInvoicesAsync(
+            int page = 1,
             InvoiceQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
@@ -53,7 +55,8 @@ namespace Nager.Moco
 
         #region Purchases
 
-        Task<Purchase[]?> GetPurchasesAsync(
+        Task<PagingInfo<Purchase>> GetPurchasesAsync(
+            int page = 1,
             PurchaseQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
@@ -61,7 +64,8 @@ namespace Nager.Moco
 
         #region Receipt
 
-        Task<Receipt[]?> GetReceiptsAsync(
+        Task<PagingInfo<Receipt>> GetReceiptsAsync(
+            int page = 1,
             ReceiptQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
