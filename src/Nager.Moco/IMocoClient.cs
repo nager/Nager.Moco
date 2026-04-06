@@ -1,4 +1,5 @@
 ﻿using Nager.Moco.Models;
+using Nager.Moco.QueryFilters;
 
 namespace Nager.Moco
 {
@@ -37,6 +38,11 @@ namespace Nager.Moco
 
         Task<Invoice?> CreateInvoiceAsync(
             InvoiceCreateRequest createRequest,
+            CancellationToken cancellationToken = default);
+
+        Task<PagingInfo<InvoicePayment>> GetInvoicePaymentsAsync(
+            int page = 1,
+            InvoicePaymentQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>

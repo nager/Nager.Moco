@@ -1,4 +1,5 @@
 ﻿using Nager.Moco.Models;
+using Nager.Moco.QueryFilters;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -225,6 +226,45 @@ namespace Nager.Moco
             //var json = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
 
             return httpResponseMessage.IsSuccessStatusCode;
+        }
+
+        /// <inheritdoc />
+        public async Task<PagingInfo<InvoicePayment>> GetInvoicePaymentsAsync(
+            int page = 1,
+            InvoicePaymentQueryFilter? queryFilter = null,
+            CancellationToken cancellationToken = default)
+        {
+            var queryParameters = new Dictionary<string, string>
+            {
+                { "page", $"{page}" }
+            };
+
+            if (queryFilter is not null)
+            {
+                if (queryFilter.DateFrom is not null)
+                {
+                    queryParameters.Add("date_from", $"{queryFilter.DateFrom:yyyy-MM-dd}");
+                }
+                if (queryFilter.DateTo is not null)
+                {
+                    queryParameters.Add("date_to", $"{queryFilter.DateTo:yyyy-MM-dd}");
+                }
+            }
+
+            var url = await this.BuildQueryAsync("/api/v1/invoices/payments", queryParameters);
+
+            using var httpResponseMessage = await this._httpClient.GetAsync(url, cancellationToken);
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            var items = await httpResponseMessage.Content.ReadFromJsonAsync<InvoicePayment[]>(this._jsonSerializerOptions, cancellationToken);
+            var total = this.GetPagingTotal(httpResponseMessage);
+
+            return new PagingInfo<InvoicePayment>
+            {
+                CurrentPage = page,
+                Total = total,
+                Items = items ?? []
+            };
         }
 
         /// <inheritdoc />

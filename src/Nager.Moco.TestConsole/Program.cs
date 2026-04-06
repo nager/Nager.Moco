@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Nager.Moco;
 using Nager.Moco.Models;
+using Nager.Moco.QueryFilters;
 
 var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
 var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
@@ -11,6 +12,7 @@ var mocoClient = new MocoClient(httpClientFactory, "mycustomdomain", "my_api_key
 var companies = await mocoClient.GetCompaniesAsync(page: 2);
 var purchases = await mocoClient.GetPurchasesAsync(page: 1, new PurchaseQueryFilter { DateFrom = new DateOnly(2025, 06, 01), DateTo = new DateOnly(2026, 04, 03) } );
 var receipts = await mocoClient.GetReceiptsAsync();
+var InvoicePayments = await mocoClient.GetInvoicePaymentsAsync();
 
 var companyCreateRequest = new CompanyCreateRequest
 {

@@ -1,4 +1,4 @@
-﻿namespace Nager.Moco.Models
+﻿namespace Nager.Moco.QueryFilters
 {
     public class ReceiptQueryFilter
     {
