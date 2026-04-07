@@ -5,5 +5,7 @@
         public DateOnly? DateFrom { get; set; }
 
         public DateOnly? DateTo { get; set; }
+
+        public int? InvoiceId { get; set; }
     }
 }

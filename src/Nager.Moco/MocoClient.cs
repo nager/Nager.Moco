@@ -37,6 +37,14 @@ namespace Nager.Moco
             this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", $"token={apiToken}");
         }
 
+        private void EnsureRequestWasSuccessful(HttpResponseMessage httpResponseMessage)
+        {
+            if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new UnauthorizedAccessException("The request was denied due to missing write permissions (403 Forbidden).");
+            }
+        }
+
         private int GetPagingTotal(HttpResponseMessage httpResponseMessage)
         {
             //httpResponseMessage.Headers.TryGetValues("X-Page", out var xPage);
@@ -125,6 +133,7 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.DeleteAsync($"/api/v1/companies/{companyId}", cancellationToken);
+            this.EnsureRequestWasSuccessful(httpResponseMessage);
 
             return httpResponseMessage.IsSuccessStatusCode;
         }
@@ -135,6 +144,7 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync("/api/v1/companies", createRequest, this._jsonSerializerOptions, cancellationToken);
+            this.EnsureRequestWasSuccessful(httpResponseMessage);
 
             httpResponseMessage.EnsureSuccessStatusCode();
 
@@ -147,6 +157,7 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync("/api/v1/invoices", createRequest, this._jsonSerializerOptions, cancellationToken);
+            this.EnsureRequestWasSuccessful(httpResponseMessage);
 
             httpResponseMessage.EnsureSuccessStatusCode();
 
@@ -159,10 +170,7 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.GetAsync($"/api/v1/invoices/{invoiceId}", cancellationToken);
-            if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return null;
-            }
+            httpResponseMessage.EnsureSuccessStatusCode();
 
             return await httpResponseMessage.Content.ReadFromJsonAsync<InvoiceDetail>(this._jsonSerializerOptions, cancellationToken);
         }
@@ -221,9 +229,9 @@ namespace Nager.Moco
             CancellationToken cancellationToken = default)
         {
             using var httpResponseMessage = await this._httpClient.PostAsJsonAsync($"/api/v1/invoices/{invoiceId}/send_email", invoiceSendEmailRequest, this._jsonSerializerOptions, cancellationToken);
-            httpResponseMessage.EnsureSuccessStatusCode();
+            this.EnsureRequestWasSuccessful(httpResponseMessage);
 
-            //var json = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+            httpResponseMessage.EnsureSuccessStatusCode();
 
             return httpResponseMessage.IsSuccessStatusCode;
         }
@@ -245,9 +253,15 @@ namespace Nager.Moco
                 {
                     queryParameters.Add("date_from", $"{queryFilter.DateFrom:yyyy-MM-dd}");
                 }
+
                 if (queryFilter.DateTo is not null)
                 {
                     queryParameters.Add("date_to", $"{queryFilter.DateTo:yyyy-MM-dd}");
+                }
+
+                if (queryFilter.InvoiceId is not null)
+                {
+                    queryParameters.Add("invoice_id", $"{queryFilter.InvoiceId}");
                 }
             }
 
@@ -265,6 +279,35 @@ namespace Nager.Moco
                 Total = total,
                 Items = items ?? []
             };
+        }
+
+        public async Task<bool> UpdateInvoicePaymentAsync(
+            int resourceId,
+            InvoicePaymentUpdateRequest updateRequest,
+            CancellationToken cancellationToken = default)
+        {
+            var url = $"/api/v1/invoices/payments/{resourceId}";
+
+            using var httpResponseMessage = await this._httpClient.PutAsJsonAsync(url, updateRequest, this._jsonSerializerOptions, cancellationToken);
+            this.EnsureRequestWasSuccessful(httpResponseMessage);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            return httpResponseMessage.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> CreateInvoicePaymentAsync(
+            InvoicePaymentCreateRequest createRequest,
+            CancellationToken cancellationToken = default)
+        {
+            var url = $"/api/v1/invoices/payments";
+
+            using var httpResponseMessage = await this._httpClient.PostAsJsonAsync(url, createRequest, this._jsonSerializerOptions, cancellationToken);
+            this.EnsureRequestWasSuccessful(httpResponseMessage);
+
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            return httpResponseMessage.IsSuccessStatusCode;
         }
 
         /// <inheritdoc />

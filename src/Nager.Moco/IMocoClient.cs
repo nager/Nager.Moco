@@ -45,6 +45,16 @@ namespace Nager.Moco
             InvoicePaymentQueryFilter? queryFilter = null,
             CancellationToken cancellationToken = default);
 
+        Task<bool> UpdateInvoicePaymentAsync(
+            int resourceId,
+            InvoicePaymentUpdateRequest updateRequest,
+            CancellationToken cancellationToken = default);
+
+
+        Task<bool> CreateInvoicePaymentAsync(
+            InvoicePaymentCreateRequest createRequest,
+            CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Send Invoice Mail
         /// </summary>
