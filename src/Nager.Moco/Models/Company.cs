@@ -5,24 +5,23 @@
         public int Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
-        public string Website { get; set; }
-        public object Email { get; set; }
-        public object BillingEmailCc { get; set; }
-        public string Phone { get; set; }
-        public string Fax { get; set; }
-        public string Address { get; set; }
-        public string CountryCode { get; set; }
-        public object VatIdentifier { get; set; }
+        public string? Website { get; set; }
+        public string? Email { get; set; }
+        public string? BillingEmailCc { get; set; }
+        public string? Phone { get; set; }
+        public string? Fax { get; set; }
+        public string? Address { get; set; }
+        public string? CountryCode { get; set; }
+        public string? VatIdentifier { get; set; }
         public bool AlternativeCorrespondenceLanguage { get; set; }
         public bool EnglishCorrespondenceLanguage { get; set; }
-        public object[] Tags { get; set; }
+        public string[] Tags { get; set; }
         public User User { get; set; }
-        public object[] Labels { get; set; }
         public string Info { get; set; }
-        public object Footer { get; set; }
+        public string? Footer { get; set; }
         public CustomProperties CustomProperties { get; set; }
         public bool Active { get; set; }
-        public object ArchivedOn { get; set; }
+        public string? ArchivedOn { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string Identifier { get; set; }
